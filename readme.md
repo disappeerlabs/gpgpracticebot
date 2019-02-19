@@ -1,4 +1,4 @@
-# GPGBot
+# Disappeer GPGPractice Bot
 
 Attempt at a Reddit r/GPGPractice bot leveraging the GPG library 
 from the [Disappeer GPG Messaging App](https://github.com/disappeerlabs/disappeer). 

@@ -21,7 +21,7 @@ class Writer:
 
     @classmethod
     def append_signature(cls):
-        signature = f'\n----------\n^(This message was posted by a bot prototype. OP can reply using the [DisappeerGPGBot PubKey]({cls.pub_key_link})). Check out the bot test subreddit: r/DisappeerGPGBotHome'
+        signature = f'\n----------\n^(This message was posted by a bot prototype. OP can reply using the [DisappeerGPGBot PubKey]({cls.pub_key_link}). Check out the bot test subreddit: r/DisappeerGPGBotHome)'
         return signature
 
     @property

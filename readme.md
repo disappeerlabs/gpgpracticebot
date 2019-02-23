@@ -7,6 +7,7 @@ from the [Disappeer GPG Messaging App](https://github.com/disappeerlabs/disappee
 
 To run the bots in this project, you must:
 - provide values for all necessary variables in your authconfig.py file
+- update all values as necessary in helpers/config.py
 - create a directory named `keys` in the project root that contains a GPG keyring
 with a single private key, and then the passphrase for this key must be added to
 your local authconfig.py file

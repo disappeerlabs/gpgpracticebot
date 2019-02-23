@@ -3,6 +3,8 @@ submissionreplybot.py
 
 """
 
+import sys
+import praw.exceptions as prawexceptions
 from bot import basegpgbot
 from helpers import config
 from db import dbfacade
@@ -21,9 +23,8 @@ class SubmissionReplyBot(basegpgbot.BaseGPGBot):
     # SUBMISSION RESPONSE FLOW #
     ############################
 
-    def run(self):
-        targets = [self.sub_private, self.sub_bothome]
-        for target in targets:
+    def run(self, target_sub_list):
+        for target in target_sub_list:
             log.debug(f"Running {self.__class__.__name__} on: r/{target}")
             self.respond_to_submissions(target)
 
@@ -72,8 +73,14 @@ class SubmissionReplyBot(basegpgbot.BaseGPGBot):
             log.error("Error writing encrypted message: " + str(err))
             return err
 
-        log.debug("Replying to submission: " + submission.title)
-        result = submission.reply(message)
+        # API rate limit is 8 minutes, will get praw.exceptions.APIException
+        try:
+            log.debug("Replying to submission: " + submission.title)
+            result = submission.reply(message)
+        except prawexceptions.APIException as err:
+            log.error("Received praw exception: " + str(err))
+            log.info("Exiting...")
+            sys.exit()
 
         self.save_submission_to_db(submission)
 

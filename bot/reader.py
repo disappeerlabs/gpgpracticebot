@@ -47,6 +47,19 @@ class Reader:
         final = ''.join(interim.split('    '))
         return final
 
+    def extract_gpg_content_from_string_bad_formatting(self, target_string):
+        # if content_type == 'key':
+        #     begin = self.target_begin_key_bad_format
+        #     end = self.target_end_key
+        # else:
+        #     raise NotImplementedError("Extraction not implemented for content type:", content_type)
+
+        first_pass = target_string.split('\n\n')
+        second_pass = [i.split('\n') for i in first_pass]
+        third_pass = ['\n'.join(i) for i in second_pass]
+        final = '\n\n'.join(third_pass)
+        return final
+
     def extract_gpg_key_from_bad_format_html_string(self, html_string):
         html = html_string
         initial = html.partition(self.target_begin_key_bad_format)[2].partition(self.target_end_key)[0]
@@ -74,7 +87,6 @@ class SubmissionReader(Reader):
     def __init__(self, submission):
         super().__init__()
         self.submission = submission
-
 
 
 class CommentReader(Reader):

@@ -6,7 +6,10 @@ import authconfig
 from bot import basegpgbot
 from helpers import config
 from db import dbfacade
+import praw.exceptions as prawexceptions
+import sys
 import logging
+
 
 log = logging.getLogger(config.title)
 
@@ -71,7 +74,7 @@ class CommentReplyBot(basegpgbot.BaseGPGBot):
 
         if not output.ok:
             log.error("Decryption Error: " + str(output.stderr))
-            raise ValueError(output.stderr)
+            return output
 
         result = self.reply_to_validated_comment(comment, validated_submission, str(output))
         return result
@@ -83,15 +86,27 @@ class CommentReplyBot(basegpgbot.BaseGPGBot):
             log.error("Error encrypting message: " + str(err))
             return err
 
-        log.debug("Replying to comment: " + validated_comment.id)
-        result = validated_comment.reply(message)
+        # API rate limit is 8 minutes, will get praw.exceptions.APIException
+        try:
+            log.debug("Replying to comment: " + validated_comment.id)
+            result = validated_comment.reply(message)
+        except prawexceptions.APIException as err:
+            validated_comment.mark_unread()
+            log.error("Received praw exception: " + str(err))
+            log.info("Exiting...")
+            sys.exit()
+
         self.save_comment_to_db(validated_comment)
 
         return result
 
     def _extract_gpg_message_from_comment(self, comment):
         raw = comment.body
-        return self.reader.extract_gpg_content_from_string('msg', raw)
+        found_string = self.reader.extract_gpg_content_from_string('msg', raw)
+        if found_string != '':
+            return found_string
+        second_try = self.reader.extract_gpg_content_from_string_bad_formatting(raw)
+        return second_try
 
     def is_already_saved_to_db(self, comment):
         comment_id = comment.id

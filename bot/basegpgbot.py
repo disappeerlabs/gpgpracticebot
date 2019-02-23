@@ -18,10 +18,6 @@ log = logging.getLogger(config.title)
 
 
 class BaseGPGBot:
-    sub_botuserpage = 'u_disappeerbots'
-    sub_private = 'cf760aaa9b034dc4f24de'
-    sub_bothome = 'DisappeerGPGBotHome'
-    sub_gpgpractice = 'gpgpractice'
 
     def __init__(self, botuser=True):
         self.reddit = redditclient.RedditClient(botuser=botuser)
@@ -56,10 +52,13 @@ class BaseGPGBot:
         if key_string != '':
             return key_string
 
-        # TODO: add try/except blocks to catch potential err
-        html_string = submission.selftext_html
-        key_string = self.reader.extract_gpg_key_from_bad_format_html_string(html_string)
-        return key_string
+        second_try = self.reader.extract_gpg_content_from_string_bad_formatting(selftext)
+        return second_try
+
+        # # TODO: This was initial second try method, replaced by aboce
+        # html_string = submission.selftext_html
+        # key_string = self.reader.extract_gpg_key_from_bad_format_html_string(html_string)
+        # return key_string
 
     def _string_contains_gpg_key(self, target_string):
         return self.reader.string_contains_gpg('key', target_string)
@@ -79,7 +78,7 @@ class BaseGPGBot:
     #######################
 
     def post_pubkey_to_subreddit(self, subreddit_name, title='DisappeerGPGBot PubKey'):
-        valid_target_subs = [self.sub_botuserpage, self.sub_private, self.sub_bothome]
+        valid_target_subs = config.private_subs
         if subreddit_name not in valid_target_subs:
             log.error(f"You cannot post to {subreddit_name}, valid subs are: " + str(valid_target_subs))
             return None

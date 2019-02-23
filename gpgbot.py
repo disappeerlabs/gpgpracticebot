@@ -56,6 +56,16 @@ def get_reddit_client():
     return client
 
 
+def get_target_sub_list(args):
+    if args.target == 'private':
+        final = config.private_subs
+    elif args.target == 'public':
+        final = config.public_subs
+    else:
+        raise NotImplementedError("No such target sub: " + args.target)
+    return final
+
+
 if __name__ == '__main__':
     args = parse_args()
     log.info("gpgbot.py args: " + str(args))
@@ -79,7 +89,8 @@ if __name__ == '__main__':
     if args.subparser == 'run':
         if args.submission:
             subbot = get_submission_reply_bot()
-            subbot.run()
+            target_list = get_target_sub_list(args)
+            subbot.run(target_list)
 
         if args.comment:
             combot = get_comment_reply_bot()

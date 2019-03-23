@@ -17,4 +17,4 @@ sub_gpgpractice = 'gpgpractice'
 
 private_subs = [sub_private, sub_bothome]
 
-public_subs = [sub_gpgpractice]
+public_subs = [sub_gpgpractice, sub_bothome]

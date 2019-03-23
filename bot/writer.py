@@ -5,6 +5,10 @@ Module for writer objects
 """
 
 import datetime
+import logging
+from helpers import config
+
+log = logging.getLogger(config.title)
 
 
 class Writer:
@@ -63,13 +67,30 @@ class SubmissionResponseWriter(Writer):
 
     def write(self):
         submission = self.submission
-        author_name = submission.author.name
-        author_created = str(datetime.datetime.fromtimestamp(submission.author.created))
+
+        if submission.author is None:
+            author_name = 'NO NAME DATA :('
+            author_created = 'NO CREATED DATA :('
+        else:
+            author_name = submission.author.name
+            author_created = str(datetime.datetime.fromtimestamp(submission.author.created))
 
         validator_key_dict = self.validator.key_dict
+
         key_id = validator_key_dict['keyid']
-        key_created = str(datetime.datetime.fromtimestamp(int(validator_key_dict['date'])))
-        key_expires = str(datetime.datetime.fromtimestamp(int(validator_key_dict['expires'])))
+        key_dict_date = validator_key_dict['date']
+        key_dict_expires = validator_key_dict['expires']
+
+        try:
+            key_created = str(datetime.datetime.fromtimestamp(int(key_dict_date)))
+        except ValueError as err:
+            key_created = 'NO CREATED VAL'
+
+        try:
+            key_expires = str(datetime.datetime.fromtimestamp(int(key_dict_expires)))
+        except ValueError as err:
+            key_expires = 'NO EXPIRES VAL'
+
         key_user = str(validator_key_dict['uids'])
         random_post = self.random_post
 
